@@ -1,0 +1,58 @@
+.listing-header {
+  background: var(--grey-100); padding: 24px 0; margin-bottom: 24px;
+}
+.listing-title { font-size: 28px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+.listing-count { font-size: 14px; color: var(--grey-500); margin-top: 4px; }
+
+.listing-content { display: flex; gap: 32px; }
+
+.listing-sidebar { width: 240px; flex-shrink: 0; }
+.filter-section { margin-bottom: 24px; }
+.filter-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+
+.filter-option {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; padding: 4px 0; cursor: pointer;
+}
+.filter-option input { accent-color: var(--black); }
+
+.price-inputs { display: flex; align-items: center; gap: 8px; }
+.price-input {
+  width: 80px; padding: 6px 8px; border: 1px solid var(--grey-300);
+  border-radius: 4px; font-size: 13px;
+}
+
+.listing-main { flex: 1; min-width: 0; }
+.listing-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; gap: 12px;
+}
+.search-result { font-size: 14px; color: var(--grey-600); }
+.sort-select {
+  padding: 6px 12px; border: 1px solid var(--grey-300); border-radius: 4px;
+  font-size: 13px; background: var(--white);
+}
+
+.empty-state {
+  text-align: center; padding: 80px 0;
+}
+.empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+.empty-state p { color: var(--grey-500); }
+
+.pagination {
+  display: flex; justify-content: center; gap: 8px; margin-top: 40px;
+}
+.page-btn {
+  width: 36px; height: 36px; border-radius: 50%; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--grey-300); transition: all 0.2s;
+}
+.page-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+.page-btn:hover:not(.active) { border-color: var(--black); }
+
+@media (max-width: 768px) {
+  .listing-content { flex-direction: column; }
+  .listing-sidebar { width: 100%; display: flex; gap: 16px; flex-wrap: wrap; }
+  .filter-section { margin-bottom: 0; }
+  .listing-title { font-size: 22px; }
+}

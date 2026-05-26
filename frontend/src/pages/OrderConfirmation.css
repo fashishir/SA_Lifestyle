@@ -1,0 +1,19 @@
+.confirmation-page { padding-top: calc(var(--header-height) + 32px); padding-bottom: 64px; }
+.confirmation-empty { text-align: center; padding: 80px 0; }
+.confirmation-empty h2 { margin-bottom: 16px; }
+
+.confirmation-card {
+  max-width: 520px; margin: 0 auto; text-align: center;
+  background: var(--grey-100); padding: 48px 32px; border-radius: 8px;
+}
+.confirmation-icon { margin-bottom: 16px; }
+.confirmation-title { font-size: 28px; font-weight: 500; margin-bottom: 4px; }
+.confirmation-id { font-size: 14px; color: var(--grey-500); margin-bottom: 16px; }
+.confirmation-text { font-size: 14px; color: var(--grey-600); margin-bottom: 32px; }
+
+.confirmation-details { text-align: left; margin-bottom: 32px; }
+.conf-detail { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--grey-200); }
+.status-badge { text-transform: capitalize; font-weight: 500; }
+
+.confirmation-actions { display: flex; gap: 12px; justify-content: center; }
+.confirmation-actions .btn { flex: 1; }

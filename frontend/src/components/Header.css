@@ -1,0 +1,78 @@
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: var(--white); border-bottom: 1px solid var(--grey-200);
+  height: var(--header-height);
+}
+
+.header-top {
+  max-width: var(--max-width); margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 100%;
+}
+
+.header-top-left { display: flex; align-items: center; gap: 32px; }
+.header-top-right { display: flex; align-items: center; gap: 12px; }
+
+.header-logo { display: flex; align-items: center; }
+.header-nav { display: flex; gap: 20px; }
+
+.nav-link {
+  font-size: 14px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 8px 0;
+  border-bottom: 2px solid transparent; transition: border-color 0.2s;
+}
+.nav-link:hover { border-bottom-color: var(--black); }
+
+.icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  transition: background 0.2s;
+}
+.icon-btn:hover { background: var(--grey-100); }
+
+.cart-btn { position: relative; }
+.cart-count {
+  position: absolute; top: 2px; right: 2px;
+  background: var(--black); color: var(--white);
+  font-size: 10px; font-weight: 700;
+  width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.search-form { display: flex; align-items: center; }
+.search-input {
+  border: 1px solid var(--grey-300); border-radius: 20px;
+  padding: 6px 16px; font-size: 14px; width: 200px;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--black); }
+
+.menu-toggle { display: none; flex-direction: column; gap: 4px; padding: 8px; }
+.menu-toggle span {
+  display: block; width: 20px; height: 2px; background: var(--black);
+  transition: 0.2s;
+}
+
+.mobile-menu {
+  display: none; background: var(--white);
+  border-top: 1px solid var(--grey-200);
+  padding: 16px 24px 24px;
+}
+.mobile-nav-link {
+  display: block; padding: 12px 0; font-size: 16px; font-weight: 500;
+  border-bottom: 1px solid var(--grey-100);
+}
+.mobile-menu hr { border: none; border-top: 1px solid var(--grey-200); margin: 8px 0; }
+.logout-btn { color: var(--red); width: 100%; text-align: left; font-size: 16px; }
+
+@media (max-width: 1024px) {
+  .header-nav { display: none; }
+  .menu-toggle { display: flex; }
+  .mobile-menu { display: block; }
+  .search-input { width: 160px; }
+}
+
+@media (max-width: 768px) {
+  .header-top { padding: 0 16px; }
+  .search-input { width: 120px; }
+}

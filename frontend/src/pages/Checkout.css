@@ -1,0 +1,43 @@
+.checkout-page { padding-top: calc(var(--header-height) + 32px); padding-bottom: 64px; }
+.checkout-title { font-size: 24px; font-weight: 500; margin-bottom: 32px; }
+
+.checkout-content { display: grid; grid-template-columns: 1fr 360px; gap: 48px; align-items: start; }
+
+.checkout-form h2 { font-size: 18px; font-weight: 500; margin-bottom: 16px; margin-top: 24px; }
+.form-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.form-input {
+  padding: 12px 14px; border: 1px solid var(--grey-300); border-radius: 4px;
+  font-size: 14px; width: calc(50% - 6px); transition: border-color 0.2s;
+}
+.form-input.full { width: 100%; }
+.form-input:focus { border-color: var(--black); }
+
+.simulated-payment { background: var(--grey-100); padding: 20px; border-radius: 4px; }
+.simulated-payment p { font-size: 13px; color: var(--grey-500); margin-bottom: 16px; }
+.card-field { margin-bottom: 12px; }
+.card-field label { display: block; font-size: 12px; color: var(--grey-600); margin-bottom: 4px; }
+.card-field .form-input { background: var(--white); cursor: not-allowed; }
+.card-row { display: flex; gap: 12px; }
+.card-row .card-field { flex: 1; }
+
+.place-order-btn { width: 100%; padding: 16px; font-size: 16px; margin-top: 24px; }
+
+.checkout-summary {
+  background: var(--grey-100); padding: 24px; border-radius: 4px;
+  position: sticky; top: calc(var(--header-height) + 16px);
+}
+.checkout-summary h3 { font-size: 18px; font-weight: 500; margin-bottom: 16px; }
+
+.checkout-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--grey-200); align-items: center; }
+.checkout-item-img { width: 64px; height: 64px; border-radius: 4px; object-fit: cover; }
+.checkout-item-name { font-size: 13px; font-weight: 500; }
+.checkout-item-detail { font-size: 12px; color: var(--grey-500); }
+.checkout-item-price { font-size: 14px; font-weight: 500; margin-left: auto; white-space: nowrap; }
+
+.checkout-summary hr { border: none; border-top: 1px solid var(--grey-300); margin: 12px 0; }
+.summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; }
+
+@media (max-width: 768px) {
+  .checkout-content { grid-template-columns: 1fr; }
+  .form-input { width: 100%; }
+}

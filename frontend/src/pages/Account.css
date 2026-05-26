@@ -1,0 +1,25 @@
+.account-page { padding-top: calc(var(--header-height) + 32px); padding-bottom: 64px; }
+.account-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+.account-greeting { font-size: 28px; font-weight: 500; }
+.account-email { color: var(--grey-500); font-size: 14px; margin-top: 4px; }
+
+.account-section { margin-bottom: 48px; }
+.account-section h2 { font-size: 20px; font-weight: 500; margin-bottom: 16px; }
+.account-empty { text-align: center; padding: 40px 0; }
+.account-empty p { margin-bottom: 16px; color: var(--grey-600); }
+
+.order-card {
+  border: 1px solid var(--grey-200); border-radius: 4px;
+  padding: 16px; margin-bottom: 12px;
+}
+.order-card-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.order-id { font-weight: 500; }
+.order-status { text-transform: capitalize; font-size: 13px; font-weight: 500; padding: 2px 8px; border-radius: 4px; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-confirmed { background: #dbeafe; color: #1e40af; }
+.status-shipped { background: #e0e7ff; color: #3730a3; }
+.status-delivered { background: #d1fae5; color: #065f46; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+.order-date { font-size: 13px; color: var(--grey-500); }
+.order-total { font-weight: 500; }
+.order-link { display: inline-block; margin-top: 8px; font-size: 13px; color: var(--grey-600); text-decoration: underline; }
