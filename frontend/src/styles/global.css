@@ -72,8 +72,43 @@ input, select, textarea { font-family: inherit; outline: none; }
 
 .page { min-height: calc(100vh - var(--header-height)); padding-top: var(--header-height); }
 
+/* ==================== */
+/*   RESPONSIVE DESIGN  */
+/* ==================== */
+
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+}
+
 @media (max-width: 768px) {
+  :root {
+    --header-height: 56px;
+  }
+
   .container { padding: 0 16px; }
-  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .section-title { font-size: 16px; }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
 }

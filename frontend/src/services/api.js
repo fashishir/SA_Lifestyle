@@ -48,15 +48,37 @@ export const orderAPI = {
 
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
-  createProduct: (data) => api.post('/admin/products', data),
-  updateProduct: (id, data) => api.put(`/admin/products/${id}`, data),
+
+  // Product CRUD with FormData support for file uploads
+  createProduct: (data) => {
+    if (data instanceof FormData) {
+      return api.post('/admin/products', data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    }
+    return api.post('/admin/products', data);
+  },
+  updateProduct: (id, data) => {
+    if (data instanceof FormData) {
+      return api.put(`/admin/products/${id}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    }
+    return api.put(`/admin/products/${id}`, data);
+  },
   deleteProduct: (id) => api.delete(`/admin/products/${id}`),
+
+  // Orders
   getOrders: (params) => api.get('/admin/orders', { params }),
   updateOrderStatus: (id, status) => api.put(`/admin/orders/${id}/status`, { status }),
   getOrderItems: (id) => api.get(`/admin/orders/${id}/items`),
+
+  // Users
   getUsers: () => api.get('/admin/users'),
   updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
+
+  // Categories
   getCategories: () => api.get('/admin/categories'),
   getCategory: (id) => api.get(`/admin/categories/${id}`),
   createCategory: (data) => api.post('/admin/categories', data),

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './AdminDashboard.css';
@@ -13,16 +14,32 @@ const navItems = [
 export default function AdminLayout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="sidebar-brand" onClick={() => navigate('/')}>
+      {/* Mobile Header */}
+      <div className="admin-mobile-header">
+        <button className="admin-hamburger" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+        <span className="admin-mobile-brand">SA_Lifestyle Admin</span>
+        <button className="admin-mobile-logout" onClick={handleLogout}>Logout</button>
+      </div>
+
+      {/* Sidebar Overlay */}
+      {sidebarOpen && <div className="admin-sidebar-overlay" onClick={closeSidebar} />}
+
+      {/* Sidebar */}
+      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-brand" onClick={() => { navigate('/'); closeSidebar(); }}>
           <span className="sidebar-logo">SA</span>
           <div>
             <div className="sidebar-brand-name">SA_Lifestyle</div>
@@ -36,6 +53,7 @@ export default function AdminLayout({ children }) {
               to={item.path}
               end={item.end}
               className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+              onClick={closeSidebar}
             >
               <span className="sidebar-icon">{item.icon}</span>
               {item.label}
@@ -53,6 +71,7 @@ export default function AdminLayout({ children }) {
           <button className="sidebar-logout" onClick={handleLogout}>Logout</button>
         </div>
       </aside>
+
       <main className="admin-main">
         {children}
       </main>

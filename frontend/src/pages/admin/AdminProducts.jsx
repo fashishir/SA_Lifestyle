@@ -34,7 +34,10 @@ export default function AdminProducts() {
   return (
     <div className="admin-section">
       <div className="admin-page-header">
-        <h1>Products</h1>
+        <div>
+          <h1>Products</h1>
+          <p className="admin-page-subtitle">{products.length} products total</p>
+        </div>
         <button className="btn btn-primary" onClick={() => { setEditingProduct(null); setShowForm(true); }}>
           + Add Product
         </button>
@@ -101,6 +104,7 @@ function ProductForm({ product, categories, onClose, onSaved }) {
     gender: product?.gender || 'unisex',
     featured: product?.featured || false,
   });
+  const [images, setImages] = useState([]);
   const [saving, setSaving] = useState(false);
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -110,26 +114,29 @@ function ProductForm({ product, categories, onClose, onSaved }) {
     e.preventDefault();
     setSaving(true);
     try {
-      const data = {
-        name: form.name,
-        slug: form.slug || form.name.toLowerCase().replace(/\s+/g, '-'),
-        description: form.description,
-        price: parseFloat(form.price),
-        compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
-        category_id: parseInt(form.category_id),
-        sizes: form.sizes.split(',').map((s) => s.trim()).filter(Boolean),
-        colors: form.colors.split(',').map((s) => {
-          const [name, hex] = s.trim().split(':');
-          return { name: name?.trim() || '', hex: hex?.trim() || '#000000' };
-        }).filter((c) => c.name),
-        gender: form.gender,
-        featured: form.featured,
-      };
+      // Build FormData for file upload support
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('slug', form.slug || form.name.toLowerCase().replace(/\s+/g, '-'));
+      formData.append('description', form.description);
+      formData.append('price', parseFloat(form.price));
+      formData.append('compare_price', form.compare_price ? parseFloat(form.compare_price) : '');
+      formData.append('category_id', parseInt(form.category_id));
+      formData.append('sizes', JSON.stringify(form.sizes.split(',').map((s) => s.trim()).filter(Boolean)));
+      formData.append('colors', JSON.stringify(form.colors.split(',').map((s) => {
+        const [name, hex] = s.trim().split(':');
+        return { name: name?.trim() || '', hex: hex?.trim() || '#000000' };
+      }).filter((c) => c.name)));
+      formData.append('gender', form.gender);
+      formData.append('featured', form.featured);
+
+      // Append image files
+      images.forEach((file) => formData.append('images', file));
 
       if (isEdit) {
-        await adminAPI.updateProduct(product.id, data);
+        await adminAPI.updateProduct(product.id, formData);
       } else {
-        await adminAPI.createProduct(data);
+        await adminAPI.createProduct(formData);
       }
       onSaved();
     } catch (err) {
@@ -158,14 +165,43 @@ function ProductForm({ product, categories, onClose, onSaved }) {
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <select name="gender" value={form.gender} onChange={handleChange} className="form-input">
-              <option value="men">Men</option><option value="women">Women</option>
-              <option value="kids">Kids</option><option value="unisex">Unisex</option>
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+              <option value="kids">Kids</option>
+              <option value="unisex">Unisex</option>
             </select>
           </div>
           <div className="form-row">
             <input name="sizes" placeholder="Sizes (comma: 6,7,8,9)" value={form.sizes} onChange={handleChange} className="form-input" />
             <input name="colors" placeholder="Colors (name:#hex, name:#hex)" value={form.colors} onChange={handleChange} className="form-input" />
           </div>
+
+          {/* Image Upload */}
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '13px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '6px' }}>
+              Product Images
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setImages(Array.from(e.target.files))}
+              style={{ fontSize: '13px' }}
+            />
+            {images.length > 0 && (
+              <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+                {images.length} file(s) selected
+              </p>
+            )}
+            {isEdit && product?.image_urls?.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                {product.image_urls.map((url, i) => (
+                  <img key={i} src={url} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                ))}
+              </div>
+            )}
+          </div>
+
           <label className="checkbox-label">
             <input type="checkbox" name="featured" checked={form.featured} onChange={handleCheck} />
             Featured Product
