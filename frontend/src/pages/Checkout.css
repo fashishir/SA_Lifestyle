@@ -4,21 +4,81 @@
 .checkout-content { display: grid; grid-template-columns: 1fr 360px; gap: 48px; align-items: start; }
 
 .checkout-form h2 { font-size: 18px; font-weight: 500; margin-bottom: 16px; margin-top: 24px; }
+.optional-tag { color: var(--grey-500); font-size: 12px; font-weight: 400; }
 .form-grid { display: flex; flex-wrap: wrap; gap: 12px; }
 .form-input {
   padding: 12px 14px; border: 1px solid var(--grey-300); border-radius: 4px;
   font-size: 14px; width: calc(50% - 6px); transition: border-color 0.2s;
+  font-family: inherit;
 }
-.form-input.full { width: 100%; }
-.form-input:focus { border-color: var(--black); }
+.form-input.full { width: 100%; resize: vertical; }
+.form-input:focus { border-color: var(--black); outline: none; }
+.form-input[required]:invalid:not(:placeholder-shown) { border-color: #ef4444; }
 
-.simulated-payment { background: var(--grey-100); padding: 20px; border-radius: 4px; }
-.simulated-payment p { font-size: 13px; color: var(--grey-500); margin-bottom: 16px; }
-.card-field { margin-bottom: 12px; }
-.card-field label { display: block; font-size: 12px; color: var(--grey-600); margin-bottom: 4px; }
-.card-field .form-input { background: var(--white); cursor: not-allowed; }
-.card-row { display: flex; gap: 12px; }
-.card-row .card-field { flex: 1; }
+/* Payment method radios */
+.payment-methods { display: flex; flex-direction: column; gap: 10px; }
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--grey-300);
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.18s ease;
+  position: relative;
+}
+.payment-option:hover { border-color: #94a3b8; transform: translateY(-1px); }
+.payment-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.payment-option-icon {
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.payment-option-body { flex: 1; min-width: 0; }
+.payment-option-title { font-size: 14px; font-weight: 600; color: var(--black); }
+.payment-option-desc { font-size: 12px; color: var(--grey-500); margin-top: 2px; }
+.payment-option-check {
+  width: 22px; height: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+.payment-option.active .payment-option-check { color: var(--dash-accent, #3b82f6); }
+
+.cod-note {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  color: #065f46;
+  font-size: 13px;
+}
+.cod-note-icon { font-size: 18px; line-height: 1.3; }
+.cod-note strong { display: block; font-size: 13px; }
+.cod-note p { margin: 4px 0 0; font-size: 12px; opacity: 0.85; }
+
+.checkout-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 16px;
+}
 
 .place-order-btn { width: 100%; padding: 16px; font-size: 16px; margin-top: 24px; }
 
@@ -35,7 +95,19 @@
 .checkout-item-price { font-size: 14px; font-weight: 500; margin-left: auto; white-space: nowrap; }
 
 .checkout-summary hr { border: none; border-top: 1px solid var(--grey-300); margin: 12px 0; }
+.summary-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--grey-700); padding: 4px 0; }
+.summary-free { color: #047857; font-weight: 600; }
 .summary-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; }
+
+.checkout-trust {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--grey-500);
+  margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--grey-200);
+}
+
+.checkout-back-link { text-align: center; margin-top: 24px; font-size: 13px; }
+.checkout-back-link a { color: var(--grey-600); text-decoration: none; }
+.checkout-back-link a:hover { color: var(--black); }
 
 @media (max-width: 768px) {
   .checkout-content { grid-template-columns: 1fr; }

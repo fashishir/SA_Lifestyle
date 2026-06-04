@@ -1,17 +1,39 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { orderAPI } from '../services/api';
 import { formatBDT } from '../utils/format';
 import './Checkout.css';
 
+const PAYMENT_METHODS = [
+  {
+    key: 'cod',
+    title: 'Cash on Delivery',
+    description: 'Pay with cash when your order arrives.',
+    icon: '💵',
+    accent: '#10b981',
+  },
+  {
+    key: 'sslcommerz',
+    title: 'Online Payment',
+    description: 'Pay securely with card / mobile banking (SSLCommerz).',
+    icon: '💳',
+    accent: '#3b82f6',
+  },
+];
+
 export default function Checkout() {
   const { user } = useAuth();
   const { items, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
-  const [address, setAddress] = useState({ fullName: '', street: '', city: '', state: '', zip: '', phone: '' });
+  const [address, setAddress] = useState({
+    fullName: '', street: '', city: '', state: '', zip: '', phone: '',
+  });
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [notes, setNotes] = useState('');
   const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState(null);
 
   if (!user) { navigate('/login'); return null; }
   if (items.length === 0) { navigate('/cart'); return null; }
@@ -22,14 +44,32 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!address.fullName || !address.street || !address.city) return;
+    setError(null);
+
+    if (!address.fullName || !address.street || !address.city) {
+      setError('Please fill in your name, street and city.');
+      return;
+    }
+    if (paymentMethod === 'cod') {
+      const phoneClean = (address.phone || '').replace(/\s|-/g, '');
+      if (phoneClean.length < 7) {
+        setError('A valid phone number is required for Cash on Delivery.');
+        return;
+      }
+    }
+
     setPlacing(true);
     try {
-      const res = await orderAPI.create({ shipping_address: address });
+      const res = await orderAPI.create({
+        shipping_address: address,
+        payment_method: paymentMethod,
+        phone: address.phone || null,
+        notes: notes.trim() || null,
+      });
       await clearCart();
       navigate(`/order-confirmation/${res.data.id}`);
     } catch (err) {
-      alert('Failed to place order: ' + (err.response?.data?.message || err.message));
+      setError(err.response?.data?.message || err.message);
     }
     setPlacing(false);
   };
@@ -47,32 +87,77 @@ export default function Checkout() {
               <input name="city" placeholder="City" value={address.city} onChange={handleChange} required className="form-input" />
               <input name="state" placeholder="State/Province" value={address.state} onChange={handleChange} className="form-input" />
               <input name="zip" placeholder="Postal Code" value={address.zip} onChange={handleChange} className="form-input" />
-              <input name="phone" placeholder="Phone Number" value={address.phone} onChange={handleChange} className="form-input" />
+              <input
+                name="phone"
+                type="tel"
+                placeholder="Phone Number (required for COD)"
+                value={address.phone}
+                onChange={handleChange}
+                required={paymentMethod === 'cod'}
+                className="form-input"
+              />
             </div>
 
-            <h2>Payment</h2>
-            <div className="simulated-payment">
-              <p>This is a simulated checkout — no real payment will be processed.</p>
-              <div className="card-preview">
-                <div className="card-field">
-                  <label>Card Number</label>
-                  <input type="text" placeholder="4242 4242 4242 4242" disabled className="form-input" />
-                </div>
-                <div className="card-row">
-                  <div className="card-field">
-                    <label>Expiry</label>
-                    <input type="text" placeholder="12/28" disabled className="form-input" />
-                  </div>
-                  <div className="card-field">
-                    <label>CVC</label>
-                    <input type="text" placeholder="123" disabled className="form-input" />
-                  </div>
+            <h2>Payment Method</h2>
+            <div className="payment-methods" role="radiogroup" aria-label="Payment method">
+              {PAYMENT_METHODS.map((m) => {
+                const active = paymentMethod === m.key;
+                return (
+                  <label
+                    key={m.key}
+                    className={`payment-option ${active ? 'active' : ''}`}
+                    style={active ? { borderColor: m.accent, boxShadow: `0 0 0 3px ${m.accent}1f` } : undefined}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value={m.key}
+                      checked={active}
+                      onChange={() => setPaymentMethod(m.key)}
+                    />
+                    <div className="payment-option-icon" style={{ background: `${m.accent}1a`, color: m.accent }}>
+                      <span aria-hidden="true">{m.icon}</span>
+                    </div>
+                    <div className="payment-option-body">
+                      <div className="payment-option-title">{m.title}</div>
+                      <div className="payment-option-desc">{m.description}</div>
+                    </div>
+                    <div className="payment-option-check" aria-hidden="true">
+                      {active ? '●' : '○'}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            {paymentMethod === 'cod' && (
+              <div className="cod-note">
+                <span className="cod-note-icon" aria-hidden="true">ℹ️</span>
+                <div>
+                  <strong>Pay in cash on delivery.</strong>
+                  <p>Please keep exact change ready. Our delivery agent will collect {formatBDT(subtotal)} at your door.</p>
                 </div>
               </div>
-            </div>
+            )}
+
+            <h2>Delivery Notes <span className="optional-tag">(optional)</span></h2>
+            <textarea
+              name="notes"
+              placeholder="Any special instructions for delivery?"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="form-input full"
+              rows={2}
+            />
+
+            {error && (
+              <div className="checkout-error" role="alert">
+                {error}
+              </div>
+            )}
 
             <button type="submit" className="btn btn-primary place-order-btn" disabled={placing}>
-              {placing ? 'Placing Order...' : `Place Order — ${formatBDT(subtotal)}`}
+              {placing ? 'Placing Order…' : `Place Order — ${formatBDT(subtotal)}`}
             </button>
           </form>
 
@@ -89,13 +174,33 @@ export default function Checkout() {
               </div>
             ))}
             <hr />
+            <div className="summary-row">
+              <span>Subtotal</span>
+              <span>{formatBDT(subtotal)}</span>
+            </div>
+            <div className="summary-row">
+              <span>Delivery</span>
+              <span className="summary-free">Free</span>
+            </div>
+            <div className="summary-row">
+              <span>Payment</span>
+              <span>{paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online (SSLCommerz)'}</span>
+            </div>
+            <hr />
             <div className="summary-total">
               <span>Total</span>
-<span>{formatBDT(subtotal)}</span>
+              <span>{formatBDT(subtotal)}</span>
+            </div>
+            <div className="checkout-trust">
+              <span>🔒 Secure checkout</span>
+              <span>↩️ 7-day easy returns</span>
+            </div>
           </div>
         </div>
+        <p className="checkout-back-link">
+          <Link to="/cart">← Back to cart</Link>
+        </p>
       </div>
-    </div>
     </div>
   );
 }
