@@ -7,42 +7,150 @@ Full-stack e-commerce for a footwear / lifestyle store. Customers browse, add to
 - **Frontend:** React 18, Vite, React Router, Recharts, Axios
 - **Backend:** Node.js, Express, PostgreSQL (`pg`), JWT auth, Multer uploads
 - **Database:** PostgreSQL (schema + seed in `database/`)
+- **Deploy:** Railway (Nixpacks) for backend + frontend, Railway Postgres for DB
+- **Local dev:** native Postgres **or** Docker Compose
 
 ## Repo layout
 
 ```
-backend/    # Express API
-frontend/   # React SPA (Vite)
-database/   # schema.sql, seed.sql
+backend/            # Express API
+  src/              # routes, controllers, middleware, config
+  scripts/          # init-db.js, migrate-cod-tracking.js
+frontend/           # React SPA (Vite)
+database/           # schema.sql, seed.sql
+deploy/             # docker-compose.yml + .env.example
 ```
 
-## Local development
+---
 
-### 1. Database
-Make sure PostgreSQL is running, then:
-```bash
-psql -U postgres -c "CREATE DATABASE sa_lifestyle;"
-psql -U postgres -d sa_lifestyle -f database/schema.sql
-psql -U postgres -d sa_lifestyle -f database/seed.sql
-```
-Or run `node backend/src/initDb.js` to drop, recreate, schema + seed in one shot.
+## Quick start — pick one path
 
-### 2. Backend
+The default Postgres credentials (user `postgres`, password `admin`, db `sa_lifestyle`) match what the backend falls back to when no `.env` is present, so the local path works with **zero config** if your local Postgres matches.
+
+### Path 1 — Local Postgres (Windows / macOS / Linux)
+
+**Prereq:** PostgreSQL 14+ running, with user `postgres` and password `admin`. If your local password is different, create `backend/.env` first (see [Configuration](#configuration) below).
+
 ```bash
+# From the repo root
 cd backend
-cp .env.example .env   # then edit values
 npm install
-npm run dev            # http://localhost:5000
+npm run db:init         # creates DB if needed, applies schema, loads seed
+npm run dev             # http://localhost:5000
+
+# In a second terminal:
+cd frontend
+npm install
+npm run dev             # http://localhost:3000
 ```
 
-### 3. Frontend
+If you want to start clean (drop & recreate all tables):
 ```bash
-cd frontend
-cp .env.example .env   # set VITE_API_URL if backend is remote
-npm install
-npm run dev            # http://localhost:3000
+npm run db:init:reset
 ```
-Vite proxies `/api/*` to `http://localhost:5000` by default.
+
+If you only want the schema (no seed data):
+```bash
+npm run db:init:no-seed
+```
+
+### Path 2 — Docker (no local Postgres install needed)
+
+**Prereq:** Docker Desktop.
+
+```bash
+# From the repo root
+cp deploy/.env.example deploy/.env      # optional, edit if you want
+cd deploy
+docker compose up --build
+```
+
+This starts three containers:
+- `sa_db` — Postgres 16 (auto-applies `schema.sql` and `seed.sql` on first boot)
+- `sa_backend` — Node 20 API on `http://localhost:5000`
+- `sa_frontend` — Vite dev server on `http://localhost:3000`
+
+To stop and wipe the DB volume:
+```bash
+docker compose down -v
+```
+
+### Path 3 — Railway Postgres (cloud, no local install)
+
+1. In your Railway project → **New** → **Database** → **PostgreSQL**.
+2. Open the Postgres service → **Variables** → copy `DATABASE_URL`.
+3. Apply the schema and seed from your local machine, using the cloud URL:
+   ```bash
+   # PowerShell
+   $env:DATABASE_URL = "postgres://user:pass@host:port/railway"
+   cd backend
+   npm install
+   npm run db:init
+   ```
+4. Create the backend Railway service from this repo (root: `backend`).
+5. In that service → **Variables** → set `DATABASE_URL` to the same value. It will override the local defaults automatically — see `backend/src/config/db.js`.
+6. Set `JWT_SECRET` to a long random string.
+
+> The same `npm run db:init` works against any reachable Postgres URL — it reads `DATABASE_URL` first and falls back to `DB_*`.
+
+---
+
+## Configuration
+
+`backend/.env` (optional, all values have sensible defaults):
+
+```env
+# Either set DATABASE_URL (cloud)...
+DATABASE_URL=postgres://user:pass@host:5432/db
+
+# ...or set the individual DB_* vars (local).
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=admin
+DB_NAME=sa_lifestyle
+
+PORT=5000
+NODE_ENV=development
+JWT_SECRET=replace-me
+CORS_ORIGIN=http://localhost:3000
+UPLOAD_DIR=./uploads
+```
+
+`frontend/.env` (optional):
+
+```env
+VITE_API_URL=https://your-backend.up.railway.app
+```
+
+If `VITE_API_URL` is unset, the frontend uses `/api` and relies on Vite's proxy to `http://localhost:5000`.
+
+---
+
+## Database scripts (backend `package.json`)
+
+| Script | What it does |
+|---|---|
+| `npm run db:init` | Creates the DB if missing, applies `database/schema.sql`, loads `database/seed.sql`. Idempotent (skips seed on duplicate key). |
+| `npm run db:init:reset` | Drops every table in the public schema first, then re-applies schema + seed. |
+| `npm run db:init:no-seed` | Only applies the schema. |
+| `npm run db:migrate:cod` | Adds COD + tracking columns to an **existing** DB. Idempotent; safe to run multiple times. |
+
+---
+
+## Migrations
+
+If you have an existing database that predates the Cash-on-Delivery / tracking-id work, run:
+
+```bash
+npm run db:migrate:cod
+```
+
+This adds `payment_method`, `payment_status`, `tracking_id`, `phone`, `notes`, and `updated_at` to the `orders` table; installs indexes; creates the `generate_tracking_id()` function and BEFORE-INSERT trigger; and backfills a `SA000001`-style tracking id for any pre-existing orders.
+
+The script is idempotent — every step uses `IF NOT EXISTS` / `CREATE OR REPLACE` so it's safe to run repeatedly.
+
+---
 
 ## Features
 
@@ -59,28 +167,8 @@ Vite proxies `/api/*` to `http://localhost:5000` by default.
 - KPI cards with animated count-up + delta vs previous period
 - Revenue area chart, order status donut, recent orders, top products
 - Product CRUD with image upload
-- Order management with status updates
+- Order management with status updates, payment method, and tracking id
 - User & category management
-
-## Deployment (Railway)
-
-Two services from the same repo:
-
-### Backend service
-- Root directory: `backend`
-- Build: Nixpacks
-- Start: `node src/index.js`
-- Env vars: `PORT`, `JWT_SECRET`, `DATABASE_URL` (Railway auto-provides Postgres `DATABASE_URL`)
-- `DB_*` vars are optional if `DATABASE_URL` is set; otherwise `backend/src/config/db.js` uses `DB_*`
-
-### Frontend service
-- Root directory: `frontend`
-- Build: `npm run build`
-- Start: `npx serve -s dist -l $PORT`
-- Env vars: `VITE_API_URL=https://<your-backend>.up.railway.app`
-
-### Database
-- Add a Railway Postgres plugin and copy its `DATABASE_URL` into the backend service.
 
 ## API surface (selected)
 
@@ -103,6 +191,7 @@ Two services from the same repo:
 - Never commit real `.env` files. `.env` is git-ignored; ship `.env.example` only.
 - The public tracking endpoint deliberately omits phone, full address, and customer email.
 - All admin routes go through `authenticate + adminOnly` middleware.
+- CORS is restricted to `CORS_ORIGIN` in production; empty value means open (dev only).
 
 ## Roadmap
 
