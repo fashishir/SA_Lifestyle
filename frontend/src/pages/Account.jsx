@@ -43,17 +43,27 @@ export default function Account() {
             </div>
           ) : (
             <div className="orders-list">
-              {orders.map((order) => (
-                <div key={order.id} className="order-card">
-                  <div className="order-card-header">
-                    <span className="order-id">Order #{order.id}</span>
-                    <span className={`order-status status-${order.status}`}>{order.status}</span>
-                    <span className="order-date">{new Date(order.created_at).toLocaleDateString()}</span>
-                    <span className="order-total">{formatBDT(order.total)}</span>
+              {orders.map((order) => {
+                const trackingId = order.tracking_id || `SA${String(order.id).padStart(6, '0')}`;
+                return (
+                  <div key={order.id} className="order-card">
+                    <div className="order-card-header">
+                      <span className="order-id">Order #{order.id}</span>
+                      <span className={`order-status status-${order.status}`}>{order.status}</span>
+                      <span className="order-date">{new Date(order.created_at).toLocaleDateString()}</span>
+                      <span className="order-total">{formatBDT(order.total)}</span>
+                    </div>
+                    <div className="order-card-tracking">
+                      <span className="order-tracking-label">Tracking:</span>
+                      <span className="order-tracking-id">{trackingId}</span>
+                    </div>
+                    <div className="order-card-actions">
+                      <Link to={`/track/${trackingId}`} className="order-link">Track Order</Link>
+                      <Link to={`/order-confirmation/${order.id}`} className="order-link">View Details</Link>
+                    </div>
                   </div>
-                  <Link to={`/order-confirmation/${order.id}`} className="order-link">View Details</Link>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

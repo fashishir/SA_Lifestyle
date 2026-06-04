@@ -87,6 +87,7 @@ export default function Header() {
           {NAV_LINKS.map((link) => (
             <Link key={link.label} to={link.path} className="mobile-nav-link" onClick={() => setMenuOpen(false)}>{link.label}</Link>
           ))}
+          <Link to="/track" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>📦 Track Order</Link>
           <hr />
           {user ? (
             <>

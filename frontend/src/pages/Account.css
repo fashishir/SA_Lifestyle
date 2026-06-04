@@ -23,3 +23,25 @@
 .order-date { font-size: 13px; color: var(--grey-500); }
 .order-total { font-weight: 500; }
 .order-link { display: inline-block; margin-top: 8px; font-size: 13px; color: var(--grey-600); text-decoration: underline; }
+.order-link:hover { color: var(--black); }
+
+.order-card-tracking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--grey-200);
+  font-size: 13px;
+}
+.order-tracking-label { color: var(--grey-500); }
+.order-tracking-id {
+  font-family: 'Monaco', 'SF Mono', 'Menlo', monospace;
+  font-weight: 600;
+  background: var(--grey-100);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.order-card-actions { display: flex; gap: 16px; margin-top: 6px; }
+.order-card-actions .order-link { margin-top: 0; }

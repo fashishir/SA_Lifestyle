@@ -93,6 +93,12 @@ export default function OrderConfirmation() {
             <div className="tracking-number">{trackingId}</div>
           </div>
 
+          <div className="confirmation-actions" style={{ marginBottom: 24 }}>
+            <Link to={`/track/${trackingId}`} className="btn btn-primary" style={{ width: '100%' }}>
+              🚚 Track this order
+            </Link>
+          </div>
+
           <div className="confirmation-details">
             <div className="conf-detail">
               <span>Status</span>
