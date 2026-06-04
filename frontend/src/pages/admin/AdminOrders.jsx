@@ -5,15 +5,24 @@ import './AdminDashboard.css';
 import './AdminOrders.css';
 
 function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('en-US', { 
-    month: 'short', day: 'numeric', year: 'numeric', 
-    hour: '2-digit', minute: '2-digit' 
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
   });
 }
 
 function generateTrackingId(orderId) {
   return `SA${String(orderId).padStart(6, '0')}`;
 }
+
+function getTrackingId(order) {
+  return order?.tracking_id || generateTrackingId(order?.id);
+}
+
+const PAYMENT_LABEL = {
+  cod: 'Cash on Delivery',
+  sslcommerz: 'Online (SSLCommerz)',
+};
 
 const statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 const statusSteps = { 'pending': 0, 'confirmed': 1, 'shipped': 2, 'delivered': 3, 'cancelled': 4 };
@@ -74,7 +83,7 @@ export default function AdminOrders() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const trackingId = generateTrackingId(order.id);
+    const trackingId = getTrackingId(order);
     const searchLower = searchQuery.toLowerCase();
     return (
       trackingId.toLowerCase().includes(searchLower) ||
@@ -137,11 +146,16 @@ export default function AdminOrders() {
             </thead>
             <tbody>
               {filteredOrders.map((o) => {
-                const trackingId = generateTrackingId(o.id);
+                const trackingId = getTrackingId(o);
                 return (
                   <tr key={o.id} className={`order-table-row status-${o.status}`}>
                     <td className="tracking-col">
                       <div className="tracking-badge-modern">{trackingId}</div>
+                      {o.payment_method && (
+                        <div className={`payment-pill payment-pill-${o.payment_method}`}>
+                          {o.payment_method === 'cod' ? 'COD' : 'Online'}
+                        </div>
+                      )}
                     </td>
                     <td className="name-col">
                       <div className="td-name">{o.user_name}</div>
@@ -159,8 +173,8 @@ export default function AdminOrders() {
                     </td>
                     <td className="date-col">{formatDate(o.created_at)}</td>
                     <td className="actions-col">
-                      <button 
-                        className="btn btn-sm btn-primary-outline" 
+                      <button
+                        className="btn btn-sm btn-primary-outline"
                         onClick={() => openOrderDetail(o)}
                       >
                         View Details
@@ -193,7 +207,7 @@ export default function AdminOrders() {
                 <div className="order-detail-grid">
                   <div className="order-detail-item">
                     <div className="order-detail-label">Tracking Number</div>
-                    <div className="order-detail-value">{generateTrackingId(selectedOrder.id)}</div>
+                    <div className="order-detail-value">{getTrackingId(selectedOrder)}</div>
                   </div>
                   <div className="order-detail-item">
                     <div className="order-detail-label">Current Status</div>
@@ -201,6 +215,18 @@ export default function AdminOrders() {
                       <span className={`order-status-badge status-${selectedOrder.status}`}>
                         {selectedOrder.status}
                       </span>
+                    </div>
+                  </div>
+                  <div className="order-detail-item">
+                    <div className="order-detail-label">Payment Method</div>
+                    <div className="order-detail-value">
+                      {PAYMENT_LABEL[selectedOrder.payment_method] || selectedOrder.payment_method || '—'}
+                    </div>
+                  </div>
+                  <div className="order-detail-item">
+                    <div className="order-detail-label">Payment Status</div>
+                    <div className="order-detail-value" style={{ textTransform: 'capitalize' }}>
+                      {selectedOrder.payment_status || '—'}
                     </div>
                   </div>
                 </div>

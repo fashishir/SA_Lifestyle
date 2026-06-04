@@ -103,6 +103,19 @@
   transition: all 0.15s;
 }
 
+.payment-pill {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.payment-pill-cod        { background: #ecfdf5; color: #047857; }
+.payment-pill-sslcommerz { background: #eff6ff; color: #1d4ed8; }
+
 .tracking-badge-modern:hover {
   background: #e0e0e0;
   cursor: default;
