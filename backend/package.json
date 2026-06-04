@@ -4,7 +4,11 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "db:init": "node scripts/init-db.js",
+    "db:init:reset": "node scripts/init-db.js --reset",
+    "db:init:no-seed": "node scripts/init-db.js --schema-only",
+    "db:migrate:cod": "node scripts/migrate-cod-tracking.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
