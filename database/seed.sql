@@ -1,7 +1,7 @@
 -- Admin user (password: admin123)
 INSERT INTO users (name, email, password_hash, role) VALUES
-('Admin', 'admin@salifestyle.com', '$2a$10$SGtAfRIx3LeTOsK84sbLQu7rQm8AC234jX.IMr35deAOGXgsZ9zWq', 'admin'),
-('John Doe', 'john@example.com', '$2a$10$SGtAfRIx3LeTOsK84sbLQu7rQm8AC234jX.IMr35deAOGXgsZ9zWq', 'customer');
+('Admin', 'admin@salifestyle.com', '$2a$10$D.rxZ0Ry9L21FKpYQGPi/e8aS.l//sDCPFcczLqBEnnJugqDDi2PS', 'admin'),
+('John Doe', 'john@example.com', '$2a$10$D.rxZ0Ry9L21FKpYQGPi/e8aS.l//sDCPFcczLqBEnnJugqDDi2PS', 'customer');
 
 -- Categories
 INSERT INTO categories (name, slug, image_url, gender) VALUES

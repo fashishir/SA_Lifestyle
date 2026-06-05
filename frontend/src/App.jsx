@@ -17,6 +17,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCategories from './pages/admin/AdminCategories';
 import TrackOrder from './pages/TrackOrder';
+import AdminRoute from './components/AdminRoute';
 
 function PublicLayout() {
   return (
@@ -44,11 +45,11 @@ function PublicLayout() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-      <Route path="/admin/products" element={<AdminLayout><AdminProducts /></AdminLayout>} />
-      <Route path="/admin/orders" element={<AdminLayout><AdminOrders /></AdminLayout>} />
-      <Route path="/admin/users" element={<AdminLayout><AdminUsers /></AdminLayout>} />
-      <Route path="/admin/categories" element={<AdminLayout><AdminCategories /></AdminLayout>} />
+      <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/products" element={<AdminRoute><AdminLayout><AdminProducts /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/orders" element={<AdminRoute><AdminLayout><AdminOrders /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/categories" element={<AdminRoute><AdminLayout><AdminCategories /></AdminLayout></AdminRoute>} />
       <Route path="/*" element={<PublicLayout />} />
     </Routes>
   );

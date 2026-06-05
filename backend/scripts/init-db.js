@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '../../..');
+const REPO_ROOT = path.resolve(__dirname, '../..');
 dotenv.config({ path: path.resolve(REPO_ROOT, 'backend/.env') });
 
 const { Client } = pkg;
@@ -49,20 +49,52 @@ async function ensureDatabase() {
 }
 
 function splitSql(sql) {
-  // Strip line comments, then split on `;` that end a line.
   const cleaned = sql
     .split('\n')
     .filter((line) => !line.trim().startsWith('--'))
     .join('\n');
-  return cleaned
-    .split(/;\s*(?:\n|$)/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+
+  const statements = [];
+  let current = '';
+  let inDollarQuote = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const ch = cleaned[i];
+    const next = cleaned[i + 1];
+
+    if (!inDollarQuote && ch === '$' && next === '$') {
+      inDollarQuote = true;
+      current += '$$';
+      i++;
+      continue;
+    }
+    if (inDollarQuote && ch === '$' && next === '$') {
+      inDollarQuote = false;
+      current += '$$';
+      i++;
+      continue;
+    }
+    if (!inDollarQuote && ch === ';') {
+      const stmt = current.trim();
+      if (stmt.length > 0) statements.push(stmt);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+
+  const tail = current.trim();
+  if (tail.length > 0) statements.push(tail);
+
+  return statements;
 }
 
 async function applyFile(client, filePath, label) {
   const sql = fs.readFileSync(filePath, 'utf8');
-  const statements = splitSql(sql);
+  const allStatements = splitSql(sql);
+  const statements = allStatements.filter(
+    (s) => !s.trim().toUpperCase().startsWith('CREATE DATABASE')
+  );
   console.log(`Applying ${label} (${statements.length} statements)...`);
   for (let i = 0; i < statements.length; i++) {
     const stmt = statements[i];

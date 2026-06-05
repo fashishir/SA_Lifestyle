@@ -40,7 +40,7 @@ export default function Login() {
           Not a member? <Link to="/register">Join Us</Link>
         </p>
         <div className="auth-demo">
-          <p>Demo: admin@nike.com / admin123</p>
+          <p>Demo: admin@salifestyle.com / admin123</p>
           <p>Demo: john@example.com / admin123</p>
         </div>
       </div>
