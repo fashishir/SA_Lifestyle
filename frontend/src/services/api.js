@@ -1,9 +1,24 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/api';
+function normalizeApiBaseUrl() {
+  const envUrl = import.meta.env.VITE_API_URL;
 
+  // Default to Vite proxy route: /api -> http://localhost:5000
+  if (!envUrl) return '/api';
+
+  // Prevent misconfiguration like:
+  // - VITE_API_URL ending with /api (would become /api/api)
+  // - accidental whitespace
+  const trimmed = String(envUrl).trim().replace(/\/+$/, '');
+
+  // If someone already provided a URL that ends with /api, don't append again
+  if (trimmed.endsWith('/api')) return trimmed;
+
+  // Otherwise append /api once
+  return `${trimmed}/api`;
+}
+
+const baseURL = normalizeApiBaseUrl();
 const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config) => {
